@@ -1,7 +1,7 @@
 import './App.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Signin } from './signin'; // Import the named export
-import { Register } from './register'; // Import the named export
+import { Signin } from './signin';
+import { Register } from './register';
 import { LandingPage } from './landing';
 import Courts from './courts';
 import RolesPage from './roles';
@@ -14,12 +14,16 @@ import Organizations from './organizations';
 import CaseForm from './caseForm';
 import ContactUs from './contact';
 import OrgCity from './orgCity';
+import AllCases from './allCases';
+import LegalTech from './legalTech';
 
 function App() {
+  const isSignInOrRegister = window.location.pathname === '/' || window.location.pathname === '/register';
+
   return (
     <div className="App">
       <Router>
-        <Navbar />
+        {!isSignInOrRegister && <Navbar />}
         <Routes>
           <Route path="/" element={<Signin />} />
           <Route path="/register" element={<Register />} />
@@ -34,6 +38,8 @@ function App() {
           <Route path="/contact" element={<ContactUs />} />
           <Route path="/myCases" element={<MyCases />} />
           <Route path="/orgCity" element={<OrgCity />} />
+          <Route path="/allCases" element={<AllCases />} />
+          <Route path="/legalTech" element={<LegalTech />} />
         </Routes>
       </Router>
     </div>

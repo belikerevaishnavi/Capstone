@@ -44,7 +44,7 @@ export function LandingPage() {
             <Typography variant="body1">
 Legal data fortress: where secrets speak securely, tech flows seamlessly, and compliance is second nature. It's not just storage; it's a symphony of security in the legal rhythm. Elevate your data game effortlessly.            </Typography>
           </div>
-          <Link to="/services">
+          <Link to="/legalTech">
           <Button variant="contained" color="primary" style={{ borderRadius: '25px', marginTop: '20px' }}>
             GET STARTED
             </Button>

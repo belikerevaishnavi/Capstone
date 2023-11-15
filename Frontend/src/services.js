@@ -3,7 +3,7 @@ import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import { Link } from 'react-router-dom';
-import organizations from './organizations.png';
+import cases from './cases.png';
 
 function ServicesPage() {
   const cardStyle = {
@@ -56,30 +56,19 @@ function ServicesPage() {
 
   return (
     <div style={rootStyle}>
+    <img src={cases} alt="Cases" style={{ position: 'absolute', width: '100%', height: '100%', opacity: 0.6 }} />
       <Typography variant="h4" gutterBottom style={{ color: 'white', padding: '50px',fontFamily:"Dancing Script", fontSize: '80px' }}>
-        Select your service
+        Manage Cases
       </Typography>
       <Grid container spacing={3} alignItems="stretch" justify="center">
         
-        <Grid item xs={12} sm={6}>
-          <Link to='/myCases' style={linkStyle}>
-            <Paper elevation={3} style={cardStyle}>
-              <div style={circleStyle}>1</div>
-              <Typography variant="h6" gutterBottom style={{ padding: '10px' ,fontFamily:'cursive'}}>
-                View Case Details
-              </Typography>
-              <Typography style={{ padding: '20px'}}>
-                View the case details pertaining to your case.
-              </Typography>
-            </Paper>
-          </Link>
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <Link to='/caseForm' style={linkStyle}>
+       
+        <Grid item xs={12} sm={12}>
+          <Link to='/allCases' style={linkStyle}>
             <Paper elevation={3} style={cardStyle}>
               <div style={circleStyle}>2</div>
               <Typography variant="h6" gutterBottom style={{ padding: '10px' ,fontFamily:'cursive'}}>
-                Submit Case Details
+                Submit And View Case Details
               </Typography>
               <Typography style={{ padding: '20px'}}>
                 Case-wise document details submission and uploading.

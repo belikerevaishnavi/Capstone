@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import CryptoJS from 'crypto-js';
 import { styled } from '@mui/system';
+import CryptoJS from 'crypto-js';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
@@ -21,7 +21,7 @@ const StyledForm = styled('form')(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
-  width:'80vw',
+  width: '80vw',
   padding: theme.spacing(3),
   borderRadius: theme.spacing(1),
   backgroundColor: '#27445C', // Light blue color
@@ -30,96 +30,111 @@ const StyledForm = styled('form')(({ theme }) => ({
 
 const StyledTextField = styled(TextField)({
   '& .MuiOutlinedInput-root': {
-    '& fieldset': {
-      //borderColor: 'white', // Border color
-    },
-    '&:hover fieldset': {
-      //borderColor: 'white', // Border color on hover
-    },
-    '&.Mui-focused fieldset': {
-      //borderColor: 'white', // Border color when focused
-    },
+    '& fieldset': {},
+    '&:hover fieldset': {},
+    '&.Mui-focused fieldset': {},
   },
   '& .MuiInputBase-input': {
     color: 'black', // Text color
     backgroundColor: 'white',
-    borderRadius:'20px',// Background color inside the text field
-
+    borderRadius: '20px', // Background color inside the text field
   },
 });
 
-const CaseForm = () => {
+const CaseForm = ({ onAddCase }) => {
   const [legalCaseTitle, setLegalCaseTitle] = useState('');
   const [legalCaseDescription, setLegalCaseDescription] = useState('');
-  const [legalCaseId, setLegalCaseId] = useState('');
   const [legalCaseStatus, setLegalCaseStatus] = useState('');
-
-  const [city, setCity] = useState('');
-  const [organizationId, setOrganizationId] = useState('');
-  const [organizationName, setOrganizationName] = useState('');
   const [file, setFile] = useState(null);
-  const [encryptedFile, setEncryptedFile] = useState(null);
 
   const handleFileChange = (event) => {
     const selectedFile = event.target.files[0];
     setFile(selectedFile);
   };
 
-  const handleEncrypt = () => {
-    if (!file || !legalCaseTitle || !legalCaseDescription || !legalCaseId|| !legalCaseStatus|| !organizationName || !organizationId || !city) {
-      alert('Please fill in all details and upload a file.');
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      const fileData = reader.result;
-      const encryptedFileData = CryptoJS.AES.encrypt(fileData, 'encryptionKey').toString();
-      setEncryptedFile(encryptedFileData);
-      downloadEncryptedFile(encryptedFileData);
-    };
-
-    reader.readAsDataURL(file);
+  const arrayBufferToString = (buffer) => {
+    return String.fromCharCode.apply(null, new Uint8Array(buffer));
   };
 
-  const downloadEncryptedFile = (encryptedData) => {
-    const blob = new Blob([encryptedData], { type: 'application/octet-stream' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'encryptedFile.txt'; // Change the filename as needed
-    link.click();
+  const handleFormSubmitAndEncrypt = async (e) => {
+    try {
+      e.preventDefault();
+
+      if (!file || !legalCaseTitle || !legalCaseDescription || !legalCaseStatus) {
+        alert('Please fill in all details and upload a file.');
+        return;
+      }
+
+      // Read the file asynchronously
+      const fileData = await readFileAsync(file);
+
+      // Encrypt the file data
+      const encryptedFileData = CryptoJS.AES.encrypt(fileData, 'encryptionKey').toString();
+
+      // Prepare the data to be added, including the encrypted file
+      const newCase = {
+        legalCaseId: new Date().getTime(),
+        legalCaseTitle,
+        legalCaseDescription,
+        legalCaseStatus,
+        encryptedFile: encryptedFileData, // Include the encrypted file data
+      };
+
+      // Call the parent component's function to add the new case
+      onAddCase(newCase);
+
+      // Reset the form fields or update the state
+      setLegalCaseTitle('');
+      setLegalCaseDescription('');
+      setLegalCaseStatus('');
+      setFile(null);
+    } catch (error) {
+      console.error('Error posting data:', error);
+
+      // Handle specific errors if needed
+      if (error.response) {
+        console.error('Server responded with an error:', error.response.data);
+      } else if (error.request) {
+        console.error('No response received:', error.request);
+      } else {
+        console.error('Error setting up the request:', error.message);
+      }
+
+      // Display a user-friendly error message
+      alert('An error occurred while processing your request. Please try again.');
+    }
+  };
+
+  // Helper function to read the file asynchronously
+  const readFileAsync = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        resolve(reader.result);
+      };
+
+      reader.onerror = () => {
+        reject(new Error('Error reading the file.'));
+      };
+
+      reader.readAsDataURL(file);
+    });
   };
 
   return (
     <StyledContainer>
-      <StyledForm>
+      <StyledForm onSubmit={handleFormSubmitAndEncrypt}>
         <Typography variant="h5" component="div" gutterBottom>
           Case Form
         </Typography>
 
         <div>Case Details</div>
-        
-        
-        <StyledTextField
-          label="Case ID"
-          value={legalCaseId}
-          onChange={(e) => setLegalCaseId(e.target.value)}
-          variant="outlined"
-          margin="normal"
-          fullWidth
-        />
+
         <StyledTextField
           label="Case Title"
           value={legalCaseTitle}
           onChange={(e) => setLegalCaseTitle(e.target.value)}
-          variant="outlined"
-          margin="normal"
-          fullWidth
-        />
-        <StyledTextField
-          label="Case Status"
-          value={legalCaseStatus}
-          onChange={(e) => setLegalCaseStatus(e.target.value)}
           variant="outlined"
           margin="normal"
           fullWidth
@@ -133,43 +148,27 @@ const CaseForm = () => {
           margin="normal"
           fullWidth
         />
-        <div>Organization Details</div>
+
         <StyledTextField
-          label="Organization Id"
-          value={organizationId}
-          onChange={(e) => setOrganizationId(e.target.value)}
+          label="Case Status"
+          value={legalCaseStatus}
+          onChange={(e) => setLegalCaseStatus(e.target.value)}
           variant="outlined"
           margin="normal"
           fullWidth
         />
-        <StyledTextField
-          label="Organization Name"
-          value={organizationName}
-          onChange={(e) => setOrganizationName(e.target.value)}
-          variant="outlined"
-          margin="normal"
-          fullWidth
-        />
-        <StyledTextField
-          label="City"
-          value={city}
-          onChange={(e) => setCity(e.target.value)}
-          variant="outlined"
-          margin="normal"
-          fullWidth
-        />
+
         <div style={{ padding: '20px' }}>Upload Document</div>
         <input type="file" onChange={handleFileChange} />
+
         <div style={{ padding: '20px' }}>
-          <Button variant="contained" color="primary" onClick={handleEncrypt} fullWidth>
+          <Button type="submit" variant="contained" color="primary" fullWidth>
             Submit
           </Button>
         </div>
-        
       </StyledForm>
     </StyledContainer>
   );
 };
 
 export default CaseForm;
-

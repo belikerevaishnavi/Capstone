@@ -50,8 +50,8 @@ function Organizations() {
   return (
     <div style={rootStyle}>
       <div style={{ width: '50%', paddingRight: '0px' }}>
-        <Typography variant="h5" gutterBottom style={{ color: '#ADD8E6', padding: '30px' }}>
-          MY LEGAL FIRM
+        <Typography variant="h4" gutterBottom style={{ color: '#ADD8E6', padding: '30px', fontFamily:'Dancing Script' }}>
+          My Legal Firm
         </Typography>
 
         {/* Display all organizations */}
