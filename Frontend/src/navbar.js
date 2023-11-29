@@ -32,6 +32,10 @@ const Navbar = () => {
           <Link to="/contact"> 
             <Button >Contact</Button>
           </Link>
+          <Link to="/knowledgebase"> 
+            <Button >InfoHub</Button>
+          </Link>
+
                   <Link to="/">
                       
             <Button >

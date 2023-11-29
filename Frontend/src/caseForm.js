@@ -1,174 +1,158 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import { styled } from '@mui/system';
-import CryptoJS from 'crypto-js';
-import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
-import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
+import { Button, TextField, Container, Paper, Typography } from '@mui/material';
 
 const StyledContainer = styled(Container)({
-  paddingTop: '80px',
   display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
   justifyContent: 'center',
-  minHeight: '100vh',
+  alignItems: 'center',
+  height: '100vh',
   minWidth: '100vw',
-  backgroundColor: '#27445C', // Darker background color
+  marginTop: '50px',
+  backgroundColor: '#27445C',
 });
 
-const StyledForm = styled('form')(({ theme }) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  width: '80vw',
-  padding: theme.spacing(3),
-  borderRadius: theme.spacing(1),
-  backgroundColor: '#27445C', // Light blue color
-  color: 'white', // Text color
-}));
+const StyledPaper = styled(Paper)({
+  padding: '40px',
+  width: '60vw',
+  backgroundColor: '#ffffff',
+});
 
 const StyledTextField = styled(TextField)({
   '& .MuiOutlinedInput-root': {
-    '& fieldset': {},
-    '&:hover fieldset': {},
-    '&.Mui-focused fieldset': {},
-  },
-  '& .MuiInputBase-input': {
-    color: 'black', // Text color
-    backgroundColor: 'white',
-    borderRadius: '20px', // Background color inside the text field
+    '& fieldset': {
+      borderColor: '#80D8FF',
+    },
+    '&:hover fieldset': {
+      borderColor: '#80D8FF',
+    },
   },
 });
 
-const CaseForm = ({ onAddCase }) => {
-  const [legalCaseTitle, setLegalCaseTitle] = useState('');
-  const [legalCaseDescription, setLegalCaseDescription] = useState('');
-  const [legalCaseStatus, setLegalCaseStatus] = useState('');
-  const [file, setFile] = useState(null);
+const initialState = {
+  legalCaseTitle: '',
+  legalCaseDescription: '',
+  legalCaseStatus: '',
+  legalCaseDocument: '', // new field for document
+  legalCaseDate: '', // new field for date
+};
 
-  const handleFileChange = (event) => {
-    const selectedFile = event.target.files[0];
-    setFile(selectedFile);
-  };
+const LegalCaseForm = () => {
+  const [formData, setFormData] = useState(initialState);
 
-  const arrayBufferToString = (buffer) => {
-    return String.fromCharCode.apply(null, new Uint8Array(buffer));
-  };
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
 
-  const handleFormSubmitAndEncrypt = async (e) => {
-    try {
-      e.preventDefault();
-
-      if (!file || !legalCaseTitle || !legalCaseDescription || !legalCaseStatus) {
-        alert('Please fill in all details and upload a file.');
-        return;
-      }
-
-      // Read the file asynchronously
-      const fileData = await readFileAsync(file);
-
-      // Encrypt the file data
-      const encryptedFileData = CryptoJS.AES.encrypt(fileData, 'encryptionKey').toString();
-
-      // Prepare the data to be added, including the encrypted file
-      const newCase = {
-        legalCaseId: new Date().getTime(),
-        legalCaseTitle,
-        legalCaseDescription,
-        legalCaseStatus,
-        encryptedFile: encryptedFileData, // Include the encrypted file data
-      };
-
-      // Call the parent component's function to add the new case
-      onAddCase(newCase);
-
-      // Reset the form fields or update the state
-      setLegalCaseTitle('');
-      setLegalCaseDescription('');
-      setLegalCaseStatus('');
-      setFile(null);
-    } catch (error) {
-      console.error('Error posting data:', error);
-
-      // Handle specific errors if needed
-      if (error.response) {
-        console.error('Server responded with an error:', error.response.data);
-      } else if (error.request) {
-        console.error('No response received:', error.request);
-      } else {
-        console.error('Error setting up the request:', error.message);
-      }
-
-      // Display a user-friendly error message
-      alert('An error occurred while processing your request. Please try again.');
+    if (name === 'legalCaseDate') {
+      // Ensure the date is in the "yyyy-mm-dd" format
+      const formattedDate = new Date(value).toISOString().split('T')[0];
+      setFormData({ ...formData, [name]: formattedDate });
+    } else {
+      setFormData({ ...formData, [name]: value });
     }
   };
 
-  // Helper function to read the file asynchronously
-  const readFileAsync = (file) => {
-    return new Promise((resolve, reject) => {
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+  
+    if (file) {
       const reader = new FileReader();
-
-      reader.onload = () => {
-        resolve(reader.result);
+      reader.onloadend = () => {
+        // Extract the base64 content without the prefix
+        const base64Content = reader.result.split(',')[1];
+        setFormData({ ...formData, legalCaseDocument: base64Content });
       };
-
-      reader.onerror = () => {
-        reject(new Error('Error reading the file.'));
-      };
-
       reader.readAsDataURL(file);
-    });
+    }
+  };
+
+  console.log(formData);
+  
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await axios.post('http://localhost:8080/v1/legalcases', {
+        legalCaseTitle: formData.legalCaseTitle,
+        legalCaseDescription: formData.legalCaseDescription,
+        legalCaseStatus: formData.legalCaseStatus,
+        legalCaseDocument: formData.legalCaseDocument,
+        // legalCaseDate: formData.legalCaseDate,
+        legalCaseOrganizationId: '2e5ececb-ed13-4325-a9e3-5bd426ea449e',
+      });
+
+      console.log('Legal case created:', response.data);
+      setFormData(initialState); // Reset the form values after successful submission
+    } catch (error) {
+      console.error('Error creating legal case:', error);
+      // Handle errors here
+    }
   };
 
   return (
     <StyledContainer>
-      <StyledForm onSubmit={handleFormSubmitAndEncrypt}>
-        <Typography variant="h5" component="div" gutterBottom>
-          Case Form
+      <StyledPaper elevation={3}>
+        <Typography variant="h3" gutterBottom style={{ fontFamily: 'Dancing Script' }}>
+          Add Case
         </Typography>
-
-        <div>Case Details</div>
-
-        <StyledTextField
-          label="Case Title"
-          value={legalCaseTitle}
-          onChange={(e) => setLegalCaseTitle(e.target.value)}
-          variant="outlined"
-          margin="normal"
-          fullWidth
-        />
-
-        <StyledTextField
-          label="Case Description"
-          value={legalCaseDescription}
-          onChange={(e) => setLegalCaseDescription(e.target.value)}
-          variant="outlined"
-          margin="normal"
-          fullWidth
-        />
-
-        <StyledTextField
-          label="Case Status"
-          value={legalCaseStatus}
-          onChange={(e) => setLegalCaseStatus(e.target.value)}
-          variant="outlined"
-          margin="normal"
-          fullWidth
-        />
-
-        <div style={{ padding: '20px' }}>Upload Document</div>
-        <input type="file" onChange={handleFileChange} />
-
-        <div style={{ padding: '20px' }}>
+        <form onSubmit={handleSubmit}>
+          <StyledTextField
+            label="Case Title"
+            variant="outlined"
+            fullWidth
+            margin="normal"
+            name="legalCaseTitle"
+            value={formData.legalCaseTitle}
+            onChange={handleInputChange}
+            required
+          />
+          <StyledTextField
+            label="Case Status"
+            variant="outlined"
+            fullWidth
+            margin="normal"
+            name="legalCaseStatus"
+            value={formData.legalCaseStatus}
+            onChange={handleInputChange}
+            required
+          />
+          <StyledTextField
+            label="Case Description"
+            variant="outlined"
+            fullWidth
+            margin="normal"
+            name="legalCaseDescription"
+            value={formData.legalCaseDescription}
+            onChange={handleInputChange}
+            multiline
+            rows={4}
+            required
+          />
+          {/* <StyledTextField
+            type="date"
+           
+            variant="outlined"
+            fullWidth
+            margin="normal"
+            name="legalCaseDate"
+            value={formData.legalCaseDate}
+            onChange={handleInputChange}
+            
+          /> */}
+          <input
+            type="file"
+            accept=".pdf, .doc, .docx" // Add the file types you want to accept
+            onChange={handleFileChange}
+            style={{ margin: '10px' }}
+          />
           <Button type="submit" variant="contained" color="primary" fullWidth>
-            Submit
+            Add Case
           </Button>
-        </div>
-      </StyledForm>
+        </form>
+      </StyledPaper>
     </StyledContainer>
   );
 };
 
-export default CaseForm;
+export default LegalCaseForm;

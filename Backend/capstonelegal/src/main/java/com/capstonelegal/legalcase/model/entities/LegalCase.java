@@ -10,10 +10,8 @@ import com.capstonelegal.organization.model.entities.Organization;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -33,18 +31,34 @@ public class LegalCase {
     @Column(name = "legal_case_status", nullable = false, length = 50)
     private String legalCaseStatus;
 
+    @Column(name = "legal_case_document")
+    private byte[] legalCaseDocument;
+
+    @Column(name = "legal_case_date")
+    private LocalDate legalCaseDate;
+
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @JoinColumn(name = "legal_case_organization_id", nullable = false)
+    private Organization legalCaseOrganizationId;
+
     public static LegalCase fromDTO(LegalCaseDTO legalCaseDTO) {
         LegalCase legalCase = new LegalCase();
-        legalCaseDTO.setLegalCaseId(legalCaseDTO.getLegalCaseId());
-        legalCaseDTO.setLegalCaseTitle(legalCaseDTO.getLegalCaseTitle());
-        legalCaseDTO.setLegalCaseDescription(legalCaseDTO.getLegalCaseDescription());
-        legalCaseDTO.setLegalCaseStatus(legalCaseDTO.getLegalCaseStatus());
 
-//        if (organizationDTO.getOrganizationCountryId() != null) {
-//            Country country = new Country();
-//            country.setCountryId(organizationDTO.getOrganizationCountryId());
-//            organization.setOrganizationCountry(country);
-//        }
+        legalCase.setLegalCaseId(legalCaseDTO.getLegalCaseId());
+        legalCase.setLegalCaseTitle(legalCaseDTO.getLegalCaseTitle());
+        legalCase.setLegalCaseDescription(legalCaseDTO.getLegalCaseDescription());
+        legalCase.setLegalCaseStatus(legalCaseDTO.getLegalCaseStatus());
+
+        legalCase.setLegalCaseDocument(legalCaseDTO.getLegalCaseDocument());
+        legalCase.setLegalCaseDate(legalCaseDTO.getLegalCaseDate());
+
+
+        if (legalCaseDTO.getLegalCaseOrganizationId() != null) {
+            Organization organization = new Organization();
+            organization.setOrganizationId(legalCaseDTO.getLegalCaseOrganizationId());
+            legalCase.setLegalCaseOrganizationId(organization);
+        }
+
 //        if (organizationDTO.getOrganizationStateId() != null) {
 //            State state = new State();
 //            state.setStateId(organizationDTO.getOrganizationStateId());

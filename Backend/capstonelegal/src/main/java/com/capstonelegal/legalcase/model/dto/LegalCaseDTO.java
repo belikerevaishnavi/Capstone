@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 
 /**
  * DTO for {@link LegalCase}
@@ -39,21 +40,34 @@ public class LegalCaseDTO implements Serializable {
     private String legalCaseTitle;
     private String legalCaseDescription;
     private String legalCaseStatus;
+    private byte[] legalCaseDocument;
+    private LocalDate legalCaseDate;
+    private String legalCaseOrganizationId;
 
 
 
     /**
-     * Converts an Organization entity object into an OrganizationDTO object
+     * Converts an LegalCase entity object into an LegalCaseDTO object
      *
-     * @param legalCase The Organization entity that will be converted into an OrganizationDTO
-     * @return The converted OrganizationDTO object
+     * @param legalCase The LegalCase entity that will be converted into an LegalCaseDTO
+     * @return The converted LegalCaseDTO object
      */
     public static LegalCaseDTO fromEntity(LegalCase legalCase) {
         LegalCaseDTO legalCaseDTO = new LegalCaseDTO();
+
         legalCaseDTO.setLegalCaseId(legalCase.getLegalCaseId());
         legalCaseDTO.setLegalCaseTitle(legalCase.getLegalCaseTitle());
         legalCaseDTO.setLegalCaseDescription(legalCase.getLegalCaseDescription());
         legalCaseDTO.setLegalCaseStatus(legalCase.getLegalCaseStatus());
+
+        legalCaseDTO.setLegalCaseDocument(legalCase.getLegalCaseDocument());
+        legalCaseDTO.setLegalCaseDate(legalCase.getLegalCaseDate());
+
+
+        if (legalCase.getLegalCaseOrganizationId() != null) {
+            legalCaseDTO.setLegalCaseOrganizationId(legalCase.getLegalCaseOrganizationId().getOrganizationId());
+//            legalCaseDTO.setLegalCaseOrganizationId(legalCase.getLegalCaseOrganizationId().getOrganizationId());
+        }
 
         return legalCaseDTO;
     }

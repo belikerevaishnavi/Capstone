@@ -44,12 +44,12 @@ public class LegalCaseService {
 
     /**
      * Fetches all organizations with optional filtering.
-     * @param legalCaseName Optional Case name to filter cases.
+     * @param legalCaseTitle Optional Case name to filter cases.
      * @param pageable Pageable object for pagination.
      * @return Page of CaseDTO.
      */
-    public Page<LegalCaseDTO> getLegalCasesByFilters(Pageable pageable, String legalCaseName) {
-        log.info("Fetching Cases with filters - case name: {}", legalCaseName, pageable.getPageNumber(), pageable.getPageSize());
+    public Page<LegalCaseDTO> getLegalCasesByFilters(Pageable pageable, String legalCaseTitle) {
+        log.info("Fetching Cases with filters - case name: {}", legalCaseTitle, pageable.getPageNumber(), pageable.getPageSize());
         // Use Specification to create custom query
         Page<LegalCase> legalCases = legalCaseRepository.findAll((Specification<LegalCase>) (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
@@ -83,8 +83,8 @@ public class LegalCaseService {
 //            }
 
             // Filtering by case name
-            if (legalCaseName != null && !legalCaseName.isEmpty()) {
-                predicates.add(criteriaBuilder.like(root.get("legalCaseName"), "%" + legalCaseName + "%"));
+            if (legalCaseTitle != null && !legalCaseTitle.isEmpty()) {
+                predicates.add(criteriaBuilder.like(root.get("legalCaseName"), "%" + legalCaseTitle + "%"));
             }
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
@@ -194,6 +194,10 @@ public class LegalCaseService {
         legalCase.setLegalCaseTitle(legalCaseDTO.getLegalCaseTitle());
         legalCase.setLegalCaseDescription(legalCaseDTO.getLegalCaseDescription());
         legalCase.setLegalCaseStatus(legalCaseDTO.getLegalCaseStatus());
+
+        legalCase.setLegalCaseDocument(legalCaseDTO.getLegalCaseDocument());
+        legalCase.setLegalCaseDate(legalCaseDTO.getLegalCaseDate());
+
 
 //        organization.setOrganizationEmail(organizationDTO.getOrganizationEmail());
 //        organization.setOrganizationPhone(organizationDTO.getOrganizationPhone());

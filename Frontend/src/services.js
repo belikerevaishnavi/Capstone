@@ -63,15 +63,42 @@ function ServicesPage() {
       <Grid container spacing={3} alignItems="stretch" justify="center">
         
        
-        <Grid item xs={12} sm={12}>
+        <Grid item xs={12} sm={4}>
+          <Link to='/caseForm' style={linkStyle}>
+            <Paper elevation={3} style={cardStyle}>
+              <div style={circleStyle}>1</div>
+              <Typography variant="h6" gutterBottom style={{ padding: '10px' ,fontFamily:'cursive'}}>
+                Submit  Case Details
+              </Typography>
+              <Typography style={{ padding: '20px'}}>
+                Case-wise document details submission and uploading.
+              </Typography>
+            </Paper>
+          </Link>
+        </Grid>
+
+         <Grid item xs={12} sm={4}>
           <Link to='/allCases' style={linkStyle}>
             <Paper elevation={3} style={cardStyle}>
               <div style={circleStyle}>2</div>
               <Typography variant="h6" gutterBottom style={{ padding: '10px' ,fontFamily:'cursive'}}>
-                Submit And View Case Details
+                View Cases
               </Typography>
               <Typography style={{ padding: '20px'}}>
-                Case-wise document details submission and uploading.
+                View the case details for your organization using Casewise.
+              </Typography>
+            </Paper>
+          </Link>
+        </Grid>
+         <Grid item xs={12} sm={4}>
+          <Link to='/calendar' style={linkStyle}>
+            <Paper elevation={3} style={cardStyle}>
+              <div style={circleStyle}>3</div>
+              <Typography variant="h6" gutterBottom style={{ padding: '10px' ,fontFamily:'cursive'}}>
+                Schedule Organizer
+              </Typography>
+              <Typography style={{ padding: '20px'}}>
+                Mark the calender for the important dates of onGoing cases.
               </Typography>
             </Paper>
           </Link>
