@@ -17,6 +17,17 @@
 * capstonelegalschema.CREDENTIALS
 */
 \c capstonelegaldevdb;
+INSERT INTO capstonelegalschema.COUNTRY (COUNTRY_ID, COUNTRY_NAME, COUNTRY_INITIALS) VALUES
+('1d9ee505-1c21-45bd-a089-7abb0604a1f2', 'India', 'IND');
+
+INSERT INTO capstonelegalschema.STATE (STATE_ID, STATE_NAME, STATE_INITIALS,COUNTRY_ID) VALUES 
+('d3f6c971-3b23-472d-a09e-1ec8c4ef7d1f','Karnataka','KA','1d9ee505-1c21-45bd-a089-7abb0604a1f2');
+
+INSERT INTO capstonelegalschema.DISTRICT (DISTRICT_ID, DISTRICT_NAME, STATE_ID) VALUES
+('7bb577d2-c091-4860-88ba-54ee5533ffc5','Bangalore Urban','d3f6c971-3b23-472d-a09e-1ec8c4ef7d1f');
+
+INSERT INTO capstonelegalschema.CITY (CITY_ID, CITY_NAME, DISTRICT_ID) VALUES
+('ea8f1d5b-8b6f-4dcd-9fc4-839b79339dc0','Bangalore ','7bb577d2-c091-4860-88ba-54ee5533ffc5');
 
 INSERT INTO capstonelegalschema.CONTACT_TYPE (CONTACT_TYPE_ID, CONTACT_TYPE_NAME, CONTACT_TYPE_DESCRIPTION) VALUES 
 ('e8f4e787-2ce7-4b41-a1cd-5d5cd127531d','Petitioner','A Petitioner is the person who brings a lawsuit or initiates legal action against another party. They seek to obtain compensation or other relief for the harm or injury they have suffered.'),
@@ -112,3 +123,11 @@ INNER JOIN
     capstonelegalschema.COURT C ON J.JUDGE_COURT_ID = C.COURT_ID
 INNER JOIN 
     capstonelegalschema.COURT_TYPE CT ON C.COURT_TYPE_ID = CT.COURT_TYPE_ID
+INNER JOIN 
+    capstonelegalschema.CITY CI ON J.JUDGE_CITY_ID = CI.CITY_ID
+INNER JOIN 
+    capstonelegalschema.DISTRICT DI ON J.JUDGE_DISTRICT_ID = DI.DISTRICT_ID
+INNER JOIN 
+    capstonelegalschema.STATE ST ON J.JUDGE_STATE_ID = ST.STATE_ID
+INNER JOIN 
+    capstonelegalschema.COUNTRY CO ON J.JUDGE_COUNTRY_ID = CO.COUNTRY_ID;
